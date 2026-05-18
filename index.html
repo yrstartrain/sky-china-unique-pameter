@@ -53,27 +53,18 @@
       max-width: 480px;
     }
 
-    .formula-box {
-      background: linear-gradient(135deg, #eaf4ff, #f3eeff);
-      border: 1.5px solid #b8d8f5;
-      border-radius: 12px;
-      padding: 14px 18px;
-      margin-bottom: 28px;
+    .card-img-box {
       text-align: center;
+      margin-bottom: 28px;
     }
 
-    .formula-box .label {
-      font-size: 0.72rem;
-      color: #7aa8cc;
-      letter-spacing: 0.06em;
-      margin-bottom: 4px;
-    }
-
-    .formula-box .formula {
-      font-size: 1.05rem;
-      color: #2a5f8f;
-      font-weight: 600;
-      font-family: 'Georgia', serif;
+    .card-img {
+      width: 110px;
+      height: 110px;
+      border-radius: 14px;
+      object-fit: cover;
+      box-shadow: 0 4px 18px rgba(100, 140, 220, 0.28);
+      border: 2.5px solid #b8d8f5;
     }
 
     .inputs-grid {
@@ -86,7 +77,7 @@
     .input-group {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
     }
 
     .input-group label {
@@ -134,6 +125,12 @@
 
     .input-group input::placeholder {
       color: #b8d0e8;
+    }
+
+    .input-group .hint {
+      font-size: 0.68rem;
+      color: #a0bcd0;
+      padding-left: 2px;
     }
 
     .btn-calc {
@@ -222,9 +219,12 @@
   </header>
 
   <div class="card">
-    <div class="formula-box">
-      <div class="label">計算式</div>
-      <div class="formula">(11y + x) &times; (1.5 + 0.1y) &times; z/100 &times; w/100</div>
+    <div class="card-img-box">
+      <img
+        src="https://img.game8.jp/11889220/4d7fdf9167c571f4d8bd719cd28c467e.webp/original"
+        alt="空と約束 倉本千奈"
+        class="card-img"
+      >
     </div>
 
     <div class="inputs-grid">
@@ -243,6 +243,7 @@
       <div class="input-group">
         <label><span class="var">w</span> パラメータ上昇量 <span class="unit">(%)</span></label>
         <input type="number" id="w" placeholder="100" min="0" step="0.1">
+        <span class="hint">ブエキ+話題沸騰なら160%</span>
       </div>
     </div>
 
@@ -263,7 +264,6 @@
   </footer>
 
   <script>
-    // Allow Enter key to trigger calculation
     document.querySelectorAll('input').forEach(input => {
       input.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
     });
@@ -286,12 +286,11 @@
         return;
       }
 
-      const base  = 11 * y + x;
-      const coeff = 1.5 + 0.1 * y;
-      const raw   = base * coeff;
+      const base   = 11 * y + x;
+      const coeff  = 1.5 + 0.1 * y;
+      const raw    = base * coeff;
       const afterZ = raw * z / 100;
       const final  = afterZ * w / 100;
-
       const rounded = Math.floor(final);
 
       resultEl.textContent = rounded.toLocaleString('ja-JP');
