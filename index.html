@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>空と約束 倉本千奈 固有札計算シミュレータ</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(160deg, #c9e8ff 0%, #e8f4ff 40%, #f0e6ff 100%);
+      font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 48px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    header .subtitle {
+      font-size: 0.8rem;
+      color: #7aa8cc;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      color: #2a5f8f;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    header .chara {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      color: #9b7ec8;
+      font-weight: 600;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(100, 160, 220, 0.18);
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .formula-box {
+      background: linear-gradient(135deg, #eaf4ff, #f3eeff);
+      border: 1.5px solid #b8d8f5;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    .formula-box .label {
+      font-size: 0.72rem;
+      color: #7aa8cc;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+
+    .formula-box .formula {
+      font-size: 1.05rem;
+      color: #2a5f8f;
+      font-weight: 600;
+      font-family: 'Georgia', serif;
+    }
+
+    .inputs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #4a7ba8;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .input-group label .var {
+      background: #2a5f8f;
+      color: #fff;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.72rem;
+      font-family: 'Georgia', serif;
+      font-style: italic;
+    }
+
+    .input-group label .unit {
+      font-size: 0.68rem;
+      color: #9bb8d0;
+      font-weight: 400;
+    }
+
+    .input-group input {
+      border: 1.5px solid #b8d8f5;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 1rem;
+      color: #1a3a5c;
+      background: #f7fbff;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+
+    .input-group input:focus {
+      border-color: #5aaee8;
+      box-shadow: 0 0 0 3px rgba(90, 174, 232, 0.18);
+      background: #fff;
+    }
+
+    .input-group input::placeholder {
+      color: #b8d0e8;
+    }
+
+    .btn-calc {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #4a9fd4, #7b5cc8);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      transition: opacity 0.2s, transform 0.1s;
+      margin-bottom: 20px;
+    }
+
+    .btn-calc:hover { opacity: 0.88; }
+    .btn-calc:active { transform: scale(0.98); }
+
+    .result-area {
+      background: linear-gradient(135deg, #eaf4ff, #f3eeff);
+      border: 1.5px solid #b8d8f5;
+      border-radius: 14px;
+      padding: 20px 18px;
+      text-align: center;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .result-area .result-label {
+      font-size: 0.75rem;
+      color: #7aa8cc;
+      letter-spacing: 0.06em;
+    }
+
+    .result-area .result-value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #2a5f8f;
+      line-height: 1.1;
+      transition: color 0.3s;
+    }
+
+    .result-area .result-value.highlight {
+      color: #7b3cc8;
+    }
+
+    .result-area .result-note {
+      font-size: 0.7rem;
+      color: #a0bcd0;
+    }
+
+    .breakdown {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 10px;
+      font-size: 0.78rem;
+      color: #4a7ba8;
+      line-height: 1.8;
+      text-align: left;
+      display: none;
+    }
+
+    .breakdown.visible { display: block; }
+
+    footer {
+      margin-top: 28px;
+      font-size: 0.68rem;
+      color: #a0bcd0;
+      text-align: center;
+      line-height: 1.8;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="subtitle">空と約束</div>
+    <h1>固有札 計算シミュレータ</h1>
+    <div class="chara">倉本千奈</div>
+  </header>
+
+  <div class="card">
+    <div class="formula-box">
+      <div class="label">計算式</div>
+      <div class="formula">(11y + x) &times; (1.5 + 0.1y) &times; z/100 &times; w/100</div>
+    </div>
+
+    <div class="inputs-grid">
+      <div class="input-group">
+        <label><span class="var">x</span> 集中</label>
+        <input type="number" id="x" placeholder="0" min="0" step="1">
+      </div>
+      <div class="input-group">
+        <label><span class="var">y</span> 好調</label>
+        <input type="number" id="y" placeholder="0" min="0" step="1">
+      </div>
+      <div class="input-group">
+        <label><span class="var">z</span> パラメータボーナス <span class="unit">(%)</span></label>
+        <input type="number" id="z" placeholder="100" min="0" step="0.1">
+      </div>
+      <div class="input-group">
+        <label><span class="var">w</span> パラメータ上昇量 <span class="unit">(%)</span></label>
+        <input type="number" id="w" placeholder="100" min="0" step="0.1">
+      </div>
+    </div>
+
+    <button class="btn-calc" onclick="calculate()">計算する</button>
+
+    <div class="result-area">
+      <div class="result-label">計算結果</div>
+      <div class="result-value" id="result">—</div>
+      <div class="result-note" id="result-note">値を入力して計算ボタンを押してください</div>
+    </div>
+
+    <div class="breakdown" id="breakdown"></div>
+  </div>
+
+  <footer>
+    ※ 計算式: (11y + x)(1.5 + 0.1y) &times; z/100 &times; w/100<br>
+    空と約束 倉本千奈 固有札シミュレータ
+  </footer>
+
+  <script>
+    // Allow Enter key to trigger calculation
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+    });
+
+    function calculate() {
+      const x = parseFloat(document.getElementById('x').value);
+      const y = parseFloat(document.getElementById('y').value);
+      const z = parseFloat(document.getElementById('z').value);
+      const w = parseFloat(document.getElementById('w').value);
+
+      const resultEl = document.getElementById('result');
+      const noteEl = document.getElementById('result-note');
+      const breakdownEl = document.getElementById('breakdown');
+
+      if ([x, y, z, w].some(v => isNaN(v))) {
+        resultEl.textContent = '—';
+        resultEl.className = 'result-value';
+        noteEl.textContent = '全ての値を入力してください';
+        breakdownEl.classList.remove('visible');
+        return;
+      }
+
+      const base  = 11 * y + x;
+      const coeff = 1.5 + 0.1 * y;
+      const raw   = base * coeff;
+      const afterZ = raw * z / 100;
+      const final  = afterZ * w / 100;
+
+      const rounded = Math.floor(final);
+
+      resultEl.textContent = rounded.toLocaleString('ja-JP');
+      resultEl.className = 'result-value highlight';
+      noteEl.textContent = `(小数点以下切捨て: ${final.toFixed(4)})`;
+
+      breakdownEl.innerHTML =
+        `<strong>計算の内訳</strong><br>` +
+        `基礎値: 11 &times; ${y} + ${x} = <b>${base}</b><br>` +
+        `係数: 1.5 + 0.1 &times; ${y} = <b>${coeff.toFixed(2)}</b><br>` +
+        `基礎 &times; 係数: ${base} &times; ${coeff.toFixed(2)} = <b>${raw.toFixed(4)}</b><br>` +
+        `&times; z(${z}%): <b>${afterZ.toFixed(4)}</b><br>` +
+        `&times; w(${w}%): <b>${final.toFixed(4)}</b>`;
+      breakdownEl.classList.add('visible');
+    }
+  </script>
+</body>
+</html>
