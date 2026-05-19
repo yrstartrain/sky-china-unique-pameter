@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>空と約束 倉本千奈 固有札計算シミュレータ</title>
+  <title>空と約束 倉本千奈 火力計算シミュレータ</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -15,73 +15,100 @@
       flex-direction: column;
       align-items: center;
       padding: 32px 16px 48px;
+      gap: 20px;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    header .subtitle {
-      font-size: 0.8rem;
-      color: #7aa8cc;
-      letter-spacing: 0.08em;
-      margin-bottom: 6px;
-    }
-
-    header h1 {
-      font-size: 1.5rem;
-      color: #2a5f8f;
-      font-weight: 700;
-      line-height: 1.4;
-    }
-
-    header .chara {
-      margin-top: 6px;
-      font-size: 0.9rem;
-      color: #9b7ec8;
-      font-weight: 600;
-    }
+    header { text-align: center; }
+    header .subtitle { font-size: 0.8rem; color: #7aa8cc; letter-spacing: 0.08em; margin-bottom: 6px; }
+    header h1 { font-size: 1.4rem; color: #2a5f8f; font-weight: 700; line-height: 1.4; }
+    header .chara { margin-top: 6px; font-size: 0.9rem; color: #9b7ec8; font-weight: 600; }
 
     .card {
       background: rgba(255, 255, 255, 0.82);
       backdrop-filter: blur(12px);
       border-radius: 20px;
       box-shadow: 0 8px 32px rgba(100, 160, 220, 0.18);
-      padding: 32px 28px;
+      padding: 24px 22px;
       width: 100%;
       max-width: 480px;
     }
 
-    .card-img-box {
-      text-align: center;
-      margin-bottom: 28px;
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
     }
 
     .card-img {
-      width: 110px;
-      height: 110px;
-      border-radius: 14px;
+      width: 70px;
+      height: 70px;
+      border-radius: 10px;
       object-fit: cover;
-      box-shadow: 0 4px 18px rgba(100, 140, 220, 0.28);
-      border: 2.5px solid #b8d8f5;
+      box-shadow: 0 4px 14px rgba(100, 140, 220, 0.25);
+      border: 2px solid #b8d8f5;
+      flex-shrink: 0;
+    }
+
+    .card-title { font-size: 1rem; font-weight: 700; color: #2a5f8f; }
+    .card-badge { font-size: 0.66rem; color: #9b7ec8; font-weight: 600; margin-left: 4px; }
+    .card-formula { font-size: 0.68rem; color: #7aa8cc; margin-top: 4px; font-family: 'Georgia', serif; }
+
+    .btn-copy {
+      width: 100%;
+      padding: 7px 12px;
+      background: rgba(90, 174, 232, 0.1);
+      color: #4a9fd4;
+      font-size: 0.76rem;
+      font-weight: 600;
+      border: 1.5px dashed #b8d8f5;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 14px;
+      transition: background 0.2s;
+    }
+    .btn-copy:hover { background: rgba(90, 174, 232, 0.2); }
+
+    .grade-toggle {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .grade-toggle label {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 8px 10px;
+      border: 1.5px solid #b8d8f5;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      color: #4a7ba8;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      user-select: none;
+    }
+    .grade-toggle input[type="radio"] { display: none; }
+    .grade-toggle label:has(input:checked) {
+      background: rgba(123, 92, 200, 0.12);
+      border-color: #9b7ec8;
+      color: #7b3cc8;
+      font-weight: 700;
     }
 
     .inputs-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 24px;
+      gap: 12px;
+      margin-bottom: 18px;
     }
 
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
+    .input-group { display: flex; flex-direction: column; gap: 4px; }
 
     .input-group label {
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 600;
       color: #4a7ba8;
       display: flex;
@@ -89,26 +116,22 @@
       gap: 4px;
     }
 
-    .input-group label .var {
+    .var {
       background: #2a5f8f;
       color: #fff;
       border-radius: 4px;
       padding: 1px 6px;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-family: 'Georgia', serif;
       font-style: italic;
     }
 
-    .input-group label .unit {
-      font-size: 0.68rem;
-      color: #9bb8d0;
-      font-weight: 400;
-    }
+    .unit { font-size: 0.66rem; color: #9bb8d0; font-weight: 400; }
 
     .input-group input {
       border: 1.5px solid #b8d8f5;
       border-radius: 10px;
-      padding: 10px 12px;
+      padding: 9px 11px;
       font-size: 1rem;
       color: #1a3a5c;
       background: #f7fbff;
@@ -116,196 +139,352 @@
       transition: border-color 0.2s, box-shadow 0.2s;
       width: 100%;
     }
-
     .input-group input:focus {
       border-color: #5aaee8;
       box-shadow: 0 0 0 3px rgba(90, 174, 232, 0.18);
       background: #fff;
     }
-
-    .input-group input::placeholder {
-      color: #b8d0e8;
-    }
-
-    .input-group .hint {
-      font-size: 0.68rem;
-      color: #a0bcd0;
-      padding-left: 2px;
-    }
+    .input-group input::placeholder { color: #b8d0e8; }
+    .hint { font-size: 0.66rem; color: #a0bcd0; }
 
     .btn-calc {
       width: 100%;
-      padding: 14px;
+      padding: 11px;
       background: linear-gradient(135deg, #4a9fd4, #7b5cc8);
       color: #fff;
-      font-size: 1rem;
+      font-size: 0.92rem;
       font-weight: 700;
       border: none;
-      border-radius: 12px;
+      border-radius: 11px;
       cursor: pointer;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       transition: opacity 0.2s, transform 0.1s;
-      margin-bottom: 20px;
+      margin-bottom: 14px;
     }
-
     .btn-calc:hover { opacity: 0.88; }
     .btn-calc:active { transform: scale(0.98); }
 
     .result-area {
       background: linear-gradient(135deg, #eaf4ff, #f3eeff);
       border: 1.5px solid #b8d8f5;
-      border-radius: 14px;
-      padding: 20px 18px;
+      border-radius: 13px;
+      padding: 14px 16px;
       text-align: center;
-      min-height: 80px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: 6px;
+      gap: 3px;
     }
 
-    .result-area .result-label {
-      font-size: 0.75rem;
-      color: #7aa8cc;
-      letter-spacing: 0.06em;
-    }
+    .result-label { font-size: 0.73rem; color: #7aa8cc; letter-spacing: 0.06em; }
 
-    .result-area .result-value {
-      font-size: 2.2rem;
+    .result-value {
+      font-size: 1.9rem;
       font-weight: 800;
       color: #2a5f8f;
-      line-height: 1.1;
+      line-height: 1.15;
       transition: color 0.3s;
     }
-
-    .result-area .result-value.highlight {
-      color: #7b3cc8;
-    }
-
-    .result-area .result-note {
-      font-size: 0.7rem;
-      color: #a0bcd0;
-    }
+    .result-value.highlight { color: #7b3cc8; }
+    .result-note { font-size: 0.66rem; color: #a0bcd0; }
 
     .breakdown {
-      margin-top: 14px;
-      padding: 12px 14px;
+      margin-top: 10px;
+      padding: 9px 13px;
       background: rgba(255,255,255,0.6);
-      border-radius: 10px;
-      font-size: 0.78rem;
+      border-radius: 9px;
+      font-size: 0.74rem;
       color: #4a7ba8;
-      line-height: 1.8;
+      line-height: 1.85;
       text-align: left;
       display: none;
     }
-
     .breakdown.visible { display: block; }
 
-    footer {
-      margin-top: 28px;
-      font-size: 0.68rem;
-      color: #a0bcd0;
+    .total-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(243,238,255,0.92));
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(123, 92, 200, 0.22);
+      border: 2px solid #c8b0f0;
+      padding: 26px 22px;
+      width: 100%;
+      max-width: 480px;
       text-align: center;
-      line-height: 1.8;
     }
+
+    .total-title { font-size: 1rem; font-weight: 700; color: #5c3aa8; margin-bottom: 14px; }
+
+    .btn-total {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #7b5cc8, #4a9fd4);
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 11px;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn-total:hover { opacity: 0.88; }
+    .btn-total:active { transform: scale(0.98); }
+
+    .total-value {
+      font-size: 2.8rem;
+      font-weight: 900;
+      color: #5c3aa8;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .total-breakdown { font-size: 0.78rem; color: #7b6aaa; line-height: 2; }
+
+    footer { font-size: 0.66rem; color: #a0bcd0; text-align: center; line-height: 1.8; }
   </style>
 </head>
 <body>
   <header>
     <div class="subtitle">空と約束</div>
-    <h1>固有札 計算シミュレータ</h1>
+    <h1>火力計算シミュレータ</h1>
     <div class="chara">倉本千奈</div>
   </header>
 
+  <!-- ① 空と約束（固有札） -->
   <div class="card">
-    <div class="card-img-box">
-      <img
-        src="https://img.game8.jp/11889220/4d7fdf9167c571f4d8bd719cd28c467e.webp/original"
-        alt="空と約束 倉本千奈"
-        class="card-img"
-      >
+    <div class="card-header">
+      <img src="https://img.game8.jp/11889220/4d7fdf9167c571f4d8bd719cd28c467e.webp/original" alt="空と約束" class="card-img">
+      <div>
+        <div class="card-title">空と約束<span class="card-badge">固有札</span></div>
+        <div class="card-formula">(11y + x)(1.5 + 0.1y) &times; z/100 &times; w/100</div>
+      </div>
     </div>
 
     <div class="inputs-grid">
       <div class="input-group">
         <label><span class="var">x</span> 集中</label>
-        <input type="number" id="x" placeholder="0" min="0" step="1">
+        <input type="number" id="x_u" placeholder="0" min="0" step="1">
       </div>
       <div class="input-group">
         <label><span class="var">y</span> 好調</label>
-        <input type="number" id="y" placeholder="0" min="0" step="1">
+        <input type="number" id="y_u" placeholder="0" min="0" step="1">
       </div>
       <div class="input-group">
-        <label><span class="var">z</span> パラメータボーナス <span class="unit">(%)</span></label>
-        <input type="number" id="z" placeholder="100" min="0" step="0.1">
+        <label><span class="var">z</span> パラボーナス <span class="unit">(%)</span></label>
+        <input type="number" id="z_u" placeholder="100" min="0" step="0.1">
       </div>
       <div class="input-group">
-        <label><span class="var">w</span> パラメータ上昇量 <span class="unit">(%)</span></label>
-        <input type="number" id="w" placeholder="100" min="0" step="0.1">
+        <label><span class="var">w</span> パラ上昇量 <span class="unit">(%)</span></label>
+        <input type="number" id="w_u" placeholder="100" min="0" step="0.1">
         <span class="hint">ブエキ+話題沸騰なら160%</span>
       </div>
     </div>
 
-    <button class="btn-calc" onclick="calculate()">計算する</button>
+    <button class="btn-calc" onclick="calc('u')「">計算する</button>
 
     <div class="result-area">
       <div class="result-label">計算結果</div>
-      <div class="result-value" id="result">—</div>
-      <div class="result-note" id="result-note">値を入力して計算ボタンを押してください</div>
+      <div class="result-value" id="result_u">—</div>
+      <div class="result-note" id="note_u">値を入力して計算ボタンを押してください</div>
+    </div>
+    <div class="breakdown" id="breakdown_u"></div>
+  </div>
+
+  <!-- ② シュプレヒコール -->
+  <div class="card">
+    <div class="card-header">
+      <img src="https://img.game8.jp/10041567/59ccc70e5b28a9df3b66ab5341745f46.png/show" alt="シュプレヒコール" class="card-img">
+      <div>
+        <div class="card-title">シュプレヒコール</div>
+        <div class="card-formula">(6 + x)(1.5 + 0.1y) &times; z/100 &times; w/100</div>
+      </div>
     </div>
 
-    <div class="breakdown" id="breakdown"></div>
+    <button class="btn-copy" onclick="copyFromUnique('s')">↑ 空千奈固有の値をコピー</button>
+
+    <div class="inputs-grid">
+      <div class="input-group">
+        <label><span class="var">x</span> 集中</label>
+        <input type="number" id="x_s" placeholder="0" min="0" step="1">
+      </div>
+      <div class="input-group">
+        <label><span class="var">y</span> 好調</label>
+        <input type="number" id="y_s" placeholder="0" min="0" step="1">
+      </div>
+      <div class="input-group">
+        <label><span class="var">z</span> パラボーナス <span class="unit">(%)</span></label>
+        <input type="number" id="z_s" placeholder="100" min="0" step="0.1">
+      </div>
+      <div class="input-group">
+        <label><span class="var">w</span> パラ上昇量 <span class="unit">(%)</span></label>
+        <input type="number" id="w_s" placeholder="100" min="0" step="0.1">
+        <span class="hint">ブエキ+話題沸騰なら160%</span>
+      </div>
+    </div>
+
+    <button class="btn-calc" onclick="calc('s')">計算する</button>
+
+    <div class="result-area">
+      <div class="result-label">計算結果</div>
+      <div class="result-value" id="result_s">—</div>
+      <div class="result-note" id="note_s">値を入力して計算ボタンを押してください</div>
+    </div>
+    <div class="breakdown" id="breakdown_s"></div>
+  </div>
+
+  <!-- ③ 至高のエンタメ -->
+  <div class="card">
+    <div class="card-header">
+      <img src="https://img.game8.jp/10230069/613f98bc861cd792f3e2a2002641de45.png/show" alt="至高のエンタメ" class="card-img">
+      <div>
+        <div class="card-title">至高のエンタメ</div>
+        <div class="card-formula">(a + x)(1.5 + 0.1y) &times; z/100 &times; w/100</div>
+      </div>
+    </div>
+
+    <div class="grade-toggle">
+      <label>
+        <input type="radio" name="grade" value="5" checked>
+        強化済み（a＝5）
+      </label>
+      <label>
+        <input type="radio" name="grade" value="4">
+        未強化（a＝4）
+      </label>
+    </div>
+
+    <button class="btn-copy" onclick="copyFromUnique('e')">↑ 空千奈固有の値をコピー</button>
+
+    <div class="inputs-grid">
+      <div class="input-group">
+        <label><span class="var">x</span> 集中</label>
+        <input type="number" id="x_e" placeholder="0" min="0" step="1">
+      </div>
+      <div class="input-group">
+        <label><span class="var">y</span> 好調</label>
+        <input type="number" id="y_e" placeholder="0" min="0" step="1">
+      </div>
+      <div class="input-group">
+        <label><span class="var">z</span> パラボーナス <span class="unit">(%)</span></label>
+        <input type="number" id="z_e" placeholder="100" min="0" step="0.1">
+      </div>
+      <div class="input-group">
+        <label><span class="var">w</span> パラ上昇量 <span class="unit">(%)</span></label>
+        <input type="number" id="w_e" placeholder="100" min="0" step="0.1">
+        <span class="hint">ブエキ+話題沸騰なら160%</span>
+      </div>
+    </div>
+
+    <button class="btn-calc" onclick="calc('e')">計算する</button>
+
+    <div class="result-area">
+      <div class="result-label">計算結果</div>
+      <div class="result-value" id="result_e">—</div>
+      <div class="result-note" id="note_e">値を入力して計算ボタンを押してください</div>
+    </div>
+    <div class="breakdown" id="breakdown_e"></div>
+  </div>
+
+  <!-- 合計 -->
+  <div class="total-card">
+    <div class="total-title">🎼 3枚合計火力</div>
+    <button class="btn-total" onclick="calcAll()">全て計算して合計を出す</button>
+    <div class="total-value" id="total-value">—</div>
+    <div class="total-breakdown" id="total-breakdown"></div>
   </div>
 
   <footer>
-    ※ 計算式: (11y + x)(1.5 + 0.1y) &times; z/100 &times; w/100<br>
-    空と約束 倉本千奈 固有札シミュレータ
+    ※ 空と約束 倉本千奈 固有札・シュプレヒコール・至高のエンタメ 火力計算
   </footer>
 
   <script>
-    document.querySelectorAll('input').forEach(input => {
-      input.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
-    });
+    const results = { u: NaN, s: NaN, e: NaN };
 
-    function calculate() {
-      const x = parseFloat(document.getElementById('x').value);
-      const y = parseFloat(document.getElementById('y').value);
-      const z = parseFloat(document.getElementById('z').value);
-      const w = parseFloat(document.getElementById('w').value);
+    function getVals(sfx) {
+      return ['x','y','z','w'].map(v => parseFloat(document.getElementById(v + '_' + sfx).value));
+    }
 
-      const resultEl = document.getElementById('result');
-      const noteEl = document.getElementById('result-note');
-      const breakdownEl = document.getElementById('breakdown');
-
-      if ([x, y, z, w].some(v => isNaN(v))) {
-        resultEl.textContent = '—';
-        resultEl.className = 'result-value';
-        noteEl.textContent = '全ての値を入力してください';
-        breakdownEl.classList.remove('visible');
-        return;
-      }
-
-      const base   = 11 * y + x;
+    function renderResult(sfx, x, y, z, w, base, baseLabel) {
       const coeff  = 1.5 + 0.1 * y;
       const raw    = base * coeff;
       const afterZ = raw * z / 100;
       const final  = afterZ * w / 100;
       const rounded = Math.floor(final);
 
-      resultEl.textContent = rounded.toLocaleString('ja-JP');
-      resultEl.className = 'result-value highlight';
-      noteEl.textContent = `(小数点以下切捨て: ${final.toFixed(4)})`;
-
-      breakdownEl.innerHTML =
-        `<strong>計算の内訳</strong><br>` +
-        `基礎値: 11 &times; ${y} + ${x} = <b>${base}</b><br>` +
-        `係数: 1.5 + 0.1 &times; ${y} = <b>${coeff.toFixed(2)}</b><br>` +
-        `基礎 &times; 係数: ${base} &times; ${coeff.toFixed(2)} = <b>${raw.toFixed(4)}</b><br>` +
-        `&times; z(${z}%): <b>${afterZ.toFixed(4)}</b><br>` +
-        `&times; w(${w}%): <b>${final.toFixed(4)}</b>`;
-      breakdownEl.classList.add('visible');
+      document.getElementById('result_' + sfx).textContent = rounded.toLocaleString('ja-JP');
+      document.getElementById('result_' + sfx).className = 'result-value highlight';
+      document.getElementById('note_' + sfx).textContent = '(小数点以下切捨て: ' + final.toFixed(4) + ')';
+      const bd = document.getElementById('breakdown_' + sfx);
+      bd.innerHTML =
+        '<strong>計算の内訳</strong><br>' +
+        '基礎値: ' + baseLabel + ' = <b>' + base + '</b><br>' +
+        '係数: 1.5 + 0.1×' + y + ' = <b>' + coeff.toFixed(2) + '</b><br>' +
+        '基礎×係数 = <b>' + raw.toFixed(4) + '</b><br>' +
+        '×z(' + z + '%) = <b>' + afterZ.toFixed(4) + '</b><br>' +
+        '×w(' + w + '%) = <b>' + final.toFixed(4) + '</b>';
+      bd.classList.add('visible');
+      return rounded;
     }
+
+    function showErr(sfx) {
+      document.getElementById('result_' + sfx).textContent = '—';
+      document.getElementById('result_' + sfx).className = 'result-value';
+      document.getElementById('note_' + sfx).textContent = '全ての値を入力してください';
+      document.getElementById('breakdown_' + sfx).classList.remove('visible');
+    }
+
+    function calc(sfx) {
+      const [x, y, z, w] = getVals(sfx);
+      if ([x, y, z, w].some(isNaN)) { showErr(sfx); results[sfx] = NaN; return; }
+
+      let base, label;
+      if (sfx === 'u') {
+        base = 11 * y + x;
+        label = '11×' + y + '+' + x;
+      } else if (sfx === 's') {
+        base = 6 + x;
+        label = '6+' + x;
+      } else {
+        const a = parseInt(document.querySelector('input[name="grade"]:checked').value);
+        base = a + x;
+        label = a + '+' + x;
+      }
+      results[sfx] = renderResult(sfx, x, y, z, w, base, label);
+    }
+
+    function calcAll() {
+      ['u','s','e'].forEach(calc);
+      const totalEl = document.getElementById('total-value');
+      const breakEl = document.getElementById('total-breakdown');
+      if (Object.values(results).some(isNaN)) {
+        totalEl.textContent = '—';
+        breakEl.textContent = '全カードの値を入力してください';
+        return;
+      }
+      const total = results.u + results.s + results.e;
+      totalEl.textContent = total.toLocaleString('ja-JP');
+      breakEl.innerHTML =
+        '空と約束: <b>' + results.u.toLocaleString('ja-JP') + '</b><br>' +
+        'シュプレヒコール: <b>' + results.s.toLocaleString('ja-JP') + '</b><br>' +
+        '至高のエンタメ: <b>' + results.e.toLocaleString('ja-JP') + '</b>';
+    }
+
+    function copyFromUnique(target) {
+      ['x','y','z','w'].forEach(function(v) {
+        document.getElementById(v + '_' + target).value =
+          document.getElementById(v + '_u').value;
+      });
+    }
+
+    document.querySelectorAll('input[type="number"]').forEach(function(el) {
+      el.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          var btn = e.target.closest('.card') && e.target.closest('.card').querySelector('.btn-calc');
+          if (btn) btn.click();
+        }
+      });
+    });
   </script>
 </body>
 </html>
