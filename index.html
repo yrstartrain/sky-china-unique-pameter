@@ -281,7 +281,7 @@
       </div>
     </div>
 
-    <button class="btn-calc" onclick="calc('u')「">計算する</button>
+    <button class="btn-calc" onclick="calc('u')">計算する</button>
 
     <div class="result-area">
       <div class="result-label">計算結果</div>
@@ -388,7 +388,7 @@
 
   <!-- 合計 -->
   <div class="total-card">
-    <div class="total-title">🎼 3枚合計火力</div>
+    <div class="total-title">3枚合計火力</div>
     <button class="btn-total" onclick="calcAll()">全て計算して合計を出す</button>
     <div class="total-value" id="total-value">—</div>
     <div class="total-breakdown" id="total-breakdown"></div>
@@ -402,7 +402,9 @@
     const results = { u: NaN, s: NaN, e: NaN };
 
     function getVals(sfx) {
-      return ['x','y','z','w'].map(v => parseFloat(document.getElementById(v + '_' + sfx).value));
+      return ['x','y','z','w'].map(function(v) {
+        return parseFloat(document.getElementById(v + '_' + sfx).value);
+      });
     }
 
     function renderResult(sfx, x, y, z, w, base, baseLabel) {
@@ -435,7 +437,8 @@
     }
 
     function calc(sfx) {
-      const [x, y, z, w] = getVals(sfx);
+      const vals = getVals(sfx);
+      const x = vals[0], y = vals[1], z = vals[2], w = vals[3];
       if ([x, y, z, w].some(isNaN)) { showErr(sfx); results[sfx] = NaN; return; }
 
       let base, label;
@@ -480,7 +483,8 @@
     document.querySelectorAll('input[type="number"]').forEach(function(el) {
       el.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
-          var btn = e.target.closest('.card') && e.target.closest('.card').querySelector('.btn-calc');
+          var card = e.target.closest('.card');
+          var btn = card && card.querySelector('.btn-calc');
           if (btn) btn.click();
         }
       });
